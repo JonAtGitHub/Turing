@@ -56,10 +56,10 @@ class Tape:
 
 class TuringMachine:
 
-    def __init__(self, states, tape_alphabet_symbols, blank_symbol, input_symbols, transition_function, initial_state, final_states):
-        _tape = Tape(tape_alphabet_symbols, blank_symbol, input_symbols) # validates those parameters
+    def __init__(self, tape, states, transition_function, initial_state, final_states):
 
-        # validate rest of the parameters
+        if type(tape) is not Tape: raise ValueError("'tape' must be instance of Tape")
+
         if type(states) is not str: raise ValueError("'states' must be a string")
         _states = set(states)
         if len(_states) == 0 or len(_states) != len(states): raise ValueError("Empty or duplicate states")
@@ -71,7 +71,7 @@ class TuringMachine:
         _final_states = set(final_states)
         if not _states.issuperset(_final_states): raise ValueError("One or more 'final_states' not found in 'states'")
 
-        self.__tape = _tape
+        self.__tape = tape
         self.__states = _states
         self.__current_state = initial_state
         self.__final_states = _final_states
@@ -97,7 +97,8 @@ def main():
     tape_alphabet_symbols = "01"
     blank_symbol = "0"
     input_symbols = "1"
-    tape_contents = "" # all blank
+    initial_tape = "0000000" # all blank
+    head_position = 3
     initial_state = "A"
     states = "ABCH"
     final_states = "H"
@@ -111,8 +112,11 @@ def main():
         ("C", "0"): ("1", "L", "B"),
         ("C", "1"): ("1", "R", "H"),
     }
-    turing_machine = TuringMachine(states, tape_alphabet_symbols, blank_symbol, input_symbols,
-                                   transition_function, initial_state, final_states)
+
+    tape = Tape(tape_alphabet_symbols, blank_symbol, input_symbols, initial_tape, head_position)
+
+    turing_machine = TuringMachine(tape, states, transition_function, initial_state, final_states)
+
     print(turing_machine)
     while not turing_machine.is_final():
         turing_machine.step()
