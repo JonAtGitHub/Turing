@@ -2,23 +2,28 @@
 class Tape:
 
     def __init__(self, tape_alphabet_symbols="", blank_symbol = " ", input_symbols="", tape_contents="", head_position=0):
+        if type(tape_alphabet_symbols) is not str: raise ValueError("'tape_alphabet_symbols' must be a string")
         alpha = set(tape_alphabet_symbols)
         if len(alpha) == 0: raise ValueError("Tape alphabet is empty")
         if len(alpha) != len(tape_alphabet_symbols): raise ValueError("Duplicate tape alphabet symbol(s) found")
 
+        if type(blank_symbol) is not str: raise ValueError("'blank_symbol' must be a string")
         if len(blank_symbol) != 1: raise ValueError("Blank symbol must be single symbol")
         if blank_symbol not in alpha: raise ValueError("Blank symbol missing from tape alphabet symbols")
 
+        if type(input_symbols) is not str: raise ValueError("'input_symbols' must be a string")
         input = set(input_symbols)
-        if len(input) == 0: raise ValueError("Input symbols missing")
+        if len(input) == 0: raise ValueError("Empty input symbols")
         if blank_symbol in input: raise ValueError("Blank symbol found in input symbols")
         if not alpha.issuperset(input): raise ValueError("Input symbol(s) missing from tape alphabet")
 
+        if type(tape_contents) is not str: raise ValueError("'tape_contents' must be a string")
         if tape_contents == "": tape_contents = blank_symbol
         tape = set(tape_contents)
         if len(tape) == 0: raise ValueError("Empty tape")
         if not alpha.issuperset(tape): raise ValueError("Input symbol(s) missing from tape contents")
 
+        if type(head_position) is not int: raise ValueError("Head position must be an integer")
         if head_position < 0 or head_position >= len(tape_contents): raise ValueError("Head position is outside of tape")
 
         self.__tape_alphabet_symbols = alpha
