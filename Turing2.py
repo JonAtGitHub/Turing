@@ -7,35 +7,28 @@ class TuringMachineWatcher:
             cls._instance = super(TuringMachineWatcher, cls).__new__(cls)
         return cls._instance
     
-    def _print_tape(self):
+    def _print_tape(self, operation):
         h = (" " * self._head_position) + "v"
-        s = "{0}\n{1}".format(h, self._tape_contents)
-        print(s)
-
-    def reset(self):
-        self._head_position = 0
-        self._tape_contents = ""
-        self._input = ""
-        self._transition = ""
-        self._final = False
+        print ("{0}: {1}".format(operation, h))
+        print ("{0}: {1}".format(operation, self._tape_contents))
 
     def tape_initialized(self, tape_contents, head_position):
         self._head_position = head_position
         self._tape_contents = tape_contents
-        self._print_tape()
+        self._print_tape("I")
 
     def extend_tape(self, tape_contents, head_position):
         self._head_position = head_position
         self._tape_contents = tape_contents
-        self._print_tape()
+        self._print_tape("X")
 
     def move_head(self, head_position):
         self._head_position = head_position
-        self._print_tape()
+        self._print_tape("M")
 
     def tape_write(self, tape_contents):
         self._tape_contents = tape_contents
-        print(self._tape_contents)
+        self._print_tape("W")
 
     def step_start(self):
         pass
@@ -44,10 +37,10 @@ class TuringMachineWatcher:
         pass
 
     def step_input(self, state_input):
-        print(state_input)
+        self._state_input = state_input
 
-    def step_transition(self, transition):
-        print(transition)
+    def step_transition(self, state_transition):
+        print (str(self._state_input) + " : " + str(state_transition))
 
 class Tape:
 
@@ -154,13 +147,11 @@ class TuringMachine:
         TuringMachineWatcher().step_complete(self.is_final())
 
 def main():
-    TuringMachineWatcher().reset()
-
     tape_alphabet_symbols = "01"
     blank_symbol = "0"
     input_symbols = "1"
-    initial_tape = "" # all blank
-    head_position = 0
+    initial_tape = "000000000" # all blank
+    head_position = 4
     initial_state = "A"
     states = "ABCH"
     final_states = "H"
