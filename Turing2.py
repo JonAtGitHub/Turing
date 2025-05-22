@@ -1,4 +1,54 @@
 
+class TuringMachineWatcher:
+    _instance = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(TuringMachineWatcher, cls).__new__(cls)
+        return cls._instance
+    
+    def _print_tape(self):
+        h = (" " * self._head_position) + "v"
+        s = "{0}\n{1}".format(h, self._tape_contents)
+        print(s)
+
+    def reset(self):
+        self._head_position = 0
+        self._tape_contents = ""
+        self._input = ""
+        self._transition = ""
+        self._final = False
+
+    def tape_initialized(self, tape_contents, head_position):
+        self._head_position = head_position
+        self._tape_contents = tape_contents
+        self._print_tape()
+
+    def extend_tape(self, tape_contents, head_position):
+        self._head_position = head_position
+        self._tape_contents = tape_contents
+        self._print_tape()
+
+    def move_head(self, head_position):
+        self._head_position = head_position
+        self._print_tape()
+
+    def tape_write(self, tape_contents):
+        self._tape_contents = tape_contents
+        print(self._tape_contents)
+
+    def step_start(self):
+        pass
+
+    def step_complete(self, is_final):
+        pass
+
+    def step_input(self, state_input):
+        print(state_input)
+
+    def step_transition(self, transition):
+        print(transition)
+
 class Tape:
 
     def __init__(self, tape_alphabet_symbols="", blank_symbol = " ", input_symbols="", tape_contents="", head_position=0):
@@ -18,7 +68,10 @@ class Tape:
         if not alpha.issuperset(input): raise ValueError("Input symbol(s) missing from tape alphabet")
 
         if type(tape_contents) is not str: raise ValueError("'tape_contents' must be a string")
-        if tape_contents == "": tape_contents = blank_symbol
+        if tape_contents == "":
+            tape_contents = blank_symbol
+            head_position = 0
+    
         tape = set(tape_contents)
         if len(tape) == 0: raise ValueError("Empty tape")
         if not alpha.issuperset(tape): raise ValueError("Input symbol(s) missing from tape contents")
@@ -32,11 +85,10 @@ class Tape:
         self.__tape_contents = list(tape_contents)
         self.__head_position = head_position
 
-    def __str__(self):
-        t = "".join(self.__tape_contents)
-        h = (" " * self.__head_position) + "v"
-        s = "{0}\n{1}".format(h, t)
-        return s
+        TuringMachineWatcher().tape_initialized(self.__stringify(), self.__head_position)
+
+    def __stringify(self):
+        return "".join(self.__tape_contents)
 
     def read(self):
         return self.__tape_contents[self.__head_position]
@@ -45,14 +97,21 @@ class Tape:
         if symbol not in self.__input_symbols: raise ValueError("Unknown write symbol")
         if direction not in "LR": raise ValueError("Invalid direction")
         self.__tape_contents[self.__head_position] = symbol
+        TuringMachineWatcher().tape_write(self.__stringify())
         if direction == "L":
             if self.__head_position > 0:
                 self.__head_position -= 1
+                TuringMachineWatcher().move_head(self.__head_position)
             else:
                 self.__tape_contents.insert(0, self.__blank_symbol)
+                TuringMachineWatcher().extend_tape(self.__stringify(), self.__head_position)
         else: #if direction == "R":
             self.__head_position += 1
-            if self.__head_position >= len(self.__tape_contents): self.__tape_contents.append(self.__blank_symbol)
+            if self.__head_position >= len(self.__tape_contents):
+                self.__tape_contents.append(self.__blank_symbol)
+                TuringMachineWatcher().extend_tape(self.__stringify(), self.__head_position)
+            else:
+                TuringMachineWatcher().move_head(self.__head_position)
 
 class TuringMachine:
 
@@ -77,28 +136,31 @@ class TuringMachine:
         self.__final_states = _final_states
         self.__transition_function = transition_function # validate!
 
-    def __str__(self):
-        return str(self.__tape)
-    
     def is_final(self):
         return self.__current_state in self.__final_states
     
     def step(self):
         if self.is_final(): return
+        TuringMachineWatcher().step_start()
         rd = self.__tape.read()
         key = (self.__current_state, rd)
         if key not in self.__transition_function: raise ValueError("No transition rule for current state+input symbol " + str(key))
+        TuringMachineWatcher().step_input(key)
         val = self.__transition_function[key]
-        self.__tape.write_and_move(val[0], val[1])
         if val[2] not in self.__states: raise ValueError("Invalid next state in transition " + str(key) + " -> " + str(val))
+        TuringMachineWatcher().step_transition(val)
+        self.__tape.write_and_move(val[0], val[1])
         self.__current_state = val[2]
+        TuringMachineWatcher().step_complete(self.is_final())
 
 def main():
+    TuringMachineWatcher().reset()
+
     tape_alphabet_symbols = "01"
     blank_symbol = "0"
     input_symbols = "1"
-    initial_tape = "0000000" # all blank
-    head_position = 3
+    initial_tape = "" # all blank
+    head_position = 0
     initial_state = "A"
     states = "ABCH"
     final_states = "H"
@@ -117,10 +179,8 @@ def main():
 
     turing_machine = TuringMachine(tape, states, transition_function, initial_state, final_states)
 
-    print(turing_machine)
     while not turing_machine.is_final():
         turing_machine.step()
-        print(turing_machine)
 
 if __name__ == "__main__":
     main()
