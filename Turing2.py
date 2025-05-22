@@ -6,7 +6,7 @@ class TuringMachineWatcher:
         if cls._instance is None:
             cls._instance = super(TuringMachineWatcher, cls).__new__(cls)
         return cls._instance
-    
+
     def _print_tape(self, operation):
         h = (" " * self._head_position) + "v"
         print ("{0}: {1}".format(operation, h))
@@ -34,7 +34,7 @@ class TuringMachineWatcher:
         pass
 
     def step_complete(self, is_final):
-        pass
+        if is_final: print ("FINAL")
 
     def step_input(self, state_input):
         self._state_input = state_input
@@ -60,17 +60,14 @@ class Tape:
         if blank_symbol in input: raise ValueError("Blank symbol found in input symbols")
         if not alpha.issuperset(input): raise ValueError("Input symbol(s) missing from tape alphabet")
 
+        if type(head_position) is not int: raise ValueError("Head position must be an integer")
+        if head_position < 0: raise ValueError("Head position is outside of tape")
+
         if type(tape_contents) is not str: raise ValueError("'tape_contents' must be a string")
-        if tape_contents == "":
-            tape_contents = blank_symbol
-            head_position = 0
-    
         tape = set(tape_contents)
         if len(tape) == 0: raise ValueError("Empty tape")
         if not alpha.issuperset(tape): raise ValueError("Input symbol(s) missing from tape contents")
-
-        if type(head_position) is not int: raise ValueError("Head position must be an integer")
-        if head_position < 0 or head_position >= len(tape_contents): raise ValueError("Head position is outside of tape")
+        if head_position >= len(tape_contents): raise ValueError("Head position is outside of tape")
 
         self.__tape_alphabet_symbols = alpha
         self.__blank_symbol = blank_symbol
@@ -131,7 +128,7 @@ class TuringMachine:
 
     def is_final(self):
         return self.__current_state in self.__final_states
-    
+
     def step(self):
         if self.is_final(): return
         TuringMachineWatcher().step_start()
@@ -146,12 +143,22 @@ class TuringMachine:
         self.__current_state = val[2]
         TuringMachineWatcher().step_complete(self.is_final())
 
+def inspect_transitions(transition_function):
+    states = set()
+    input_symbols = set()
+    for k, v in transition_function.items():
+        states.add(k[0])
+        input_symbols.add(k[1])
+        input_symbols.add(v[0])
+        states.add(v[2])
+    return ("".join(sorted(states)), "".join(sorted(input_symbols)))
+
 def main():
     tape_alphabet_symbols = "01"
     blank_symbol = "0"
     input_symbols = "1"
-    initial_tape = "000000000" # all blank
-    head_position = 4
+    initial_tape = "000000000"; head_position = 4
+    initial_tape = "0"; head_position = 0
     initial_state = "A"
     states = "ABCH"
     final_states = "H"
@@ -165,6 +172,8 @@ def main():
         ("C", "0"): ("1", "L", "B"),
         ("C", "1"): ("1", "R", "H"),
     }
+
+    inspection_results = inspect_transitions(transition_function)
 
     tape = Tape(tape_alphabet_symbols, blank_symbol, input_symbols, initial_tape, head_position)
 
