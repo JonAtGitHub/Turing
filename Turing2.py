@@ -154,15 +154,15 @@ def inspect_transitions(transition_function):
     return ("".join(sorted(states)), "".join(sorted(input_symbols)))
 
 def main():
-    tape_alphabet_symbols = "01"
-    blank_symbol = "0"
-    input_symbols = "1"
+    Gamma = tape_alphabet_symbols = "01"
+    b = blank_symbol = "0"
+    Sigma = input_symbols = "1"
     initial_tape = "000000000"; head_position = 4
     initial_tape = "0"; head_position = 0
-    initial_state = "A"
-    states = "ABCH"
-    final_states = "H"
-    transition_function = {
+    q0 = initial_state = "A"
+    Q = states = "ABCH"
+    F = final_states = "H"
+    delta = transition_function = {
         # (current state, read symbol): (write symbol, head direction, next state)
         # 3 state busy beaver
         ("A", "0"): ("1", "R", "B"),
