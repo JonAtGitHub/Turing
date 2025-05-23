@@ -91,7 +91,7 @@ _configs[_tm.name] = _tm
 
 #*********************************************************************
 # L = { 0^(2^n) | n >= 0 }
-# from https://ics.uci.edu/~goodrich/teach/cs162/notes/turing2.pdf
+# from p3 https://ics.uci.edu/~goodrich/teach/cs162/notes/turing2.pdf
 
 @dataclass
 class Uci02n(TuringMachineConfiguration):
@@ -123,5 +123,66 @@ class Uci02n(TuringMachineConfiguration):
     })
 
 _tm = Uci02n()
+_configs[_tm.name] = _tm
+
+#*********************************************************************
+# L = { w#w | w E {0, 1}* }
+# from p10 https://ics.uci.edu/~goodrich/teach/cs162/notes/turing2.pdf
+
+@dataclass
+class wPoundw(TuringMachineConfiguration):
+    name: str                   = "w#w"
+    tape_alphabet_symbols: str  = "01#x_"
+    blank_symbol: str           = "_"
+    input_symbols: str          = "01#"
+    initial_tape: str           = "01#10"
+    head_position: int          = 0
+    initial_state: str          = "1"
+    final_states: str           = "AR"
+    states: str                 = "12345687AR"
+    transition_function: dict   = field(default_factory=lambda: {
+        ("1", "0"): ("x", "R", "2"),
+        ("1", "1"): ("x", "R", "3"),
+        ("1", "#"): ("#", "R", "8"),
+        ("1", "x"): ("x", "R", "R"),
+        ("1", "_"): ("_", "R", "R"),
+        ("2", "0"): ("0", "R", "2"),
+        ("2", "1"): ("1", "R", "2"),
+        ("2", "#"): ("#", "R", "4"),
+        ("2", "x"): ("x", "R", "R"),
+        ("2", "_"): ("_", "R", "R"),
+        ("3", "0"): ("0", "R", "3"),
+        ("3", "1"): ("1", "R", "3"),
+        ("3", "#"): ("#", "R", "5"),
+        ("3", "x"): ("x", "R", "R"),
+        ("3", "_"): ("_", "R", "R"),
+        ("4", "0"): ("x", "L", "6"),
+        ("4", "1"): ("1", "R", "R"),
+        ("4", "#"): ("#", "R", "R"),
+        ("4", "x"): ("x", "R", "4"),
+        ("4", "_"): ("_", "R", "R"),
+        ("5", "0"): ("0", "R", "R"),
+        ("5", "1"): ("x", "L", "6"),
+        ("5", "#"): ("#", "R", "R"),
+        ("5", "x"): ("x", "R", "5"),
+        ("5", "_"): ("_", "R", "R"),
+        ("6", "0"): ("0", "L", "6"),
+        ("6", "1"): ("1", "L", "6"),
+        ("6", "#"): ("#", "L", "7"),
+        ("6", "x"): ("x", "L", "6"),
+        ("6", "_"): ("_", "R", "R"),
+        ("7", "0"): ("0", "L", "7"),
+        ("7", "1"): ("1", "L", "7"),
+        ("7", "#"): ("#", "R", "R"),
+        ("7", "x"): ("x", "R", "1"),
+        ("7", "_"): ("_", "R", "R"),
+        ("8", "0"): ("0", "R", "R"),
+        ("8", "1"): ("1", "R", "R"),
+        ("8", "#"): ("#", "R", "R"),
+        ("8", "x"): ("x", "R", "8"),
+        ("8", "_"): ("_", "R", "A"),
+    })
+
+_tm = wPoundw()
 _configs[_tm.name] = _tm
 
