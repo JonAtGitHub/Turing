@@ -21,8 +21,11 @@ def get(name):
     if name not in _configs: raise ValueError("Configuration " + name + " not found")
     return _configs[name]
 
+#*********************************************************************
+# from https://en.wikipedia.org/wiki/Turing_machine
+
 @dataclass
-class BusyBeaverTuringMachine(TuringMachineConfiguration):
+class BusyBeaver(TuringMachineConfiguration):
     name: str                   = "BusyBeaver"
     tape_alphabet_symbols: str  = "01"
     blank_symbol: str           = "0"
@@ -41,14 +44,48 @@ class BusyBeaverTuringMachine(TuringMachineConfiguration):
         ("C", "1"): ("1", "R", "H"),
     })
 
-_busy_beaver = BusyBeaverTuringMachine()
-_configs[_busy_beaver.name] = _busy_beaver
+_tm = BusyBeaver()
+_configs[_tm.name] = _tm
 
 @dataclass
-class BusyBeaver2TuringMachine(BusyBeaverTuringMachine):
+class BusyBeaver2(BusyBeaver):
     name: str                   = "BusyBeaver2"
     initial_tape: str           = "0000000"
     head_position: int          = 3
 
-_busy_beaver2 = BusyBeaver2TuringMachine()
-_configs[_busy_beaver2.name] = _busy_beaver2
+_tm = BusyBeaver2()
+_configs[_tm.name] = _tm
+
+#*********************************************************************
+# L = { 0^n1^n | n E N }
+# from https://web.stanford.edu/class/archive/cs/cs103/cs103.1142/lectures/18/Small18.pdf
+
+@dataclass
+class Stanford0n1n(TuringMachineConfiguration):
+    name: str                   = "Stanford0n1n"
+    tape_alphabet_symbols: str  = "_01"
+    blank_symbol: str           = "_"
+    input_symbols: str          = "01"
+    initial_tape: str           = "_0011_"
+    head_position: int          = 1
+    initial_state: str          = "0"
+    final_states: str           = "AR"
+    states: str                 = "0123AR"
+    transition_function: dict   = field(default_factory=lambda: {
+        ("0", "0"): ("_", "R", "1"),
+        ("0", "1"): ("1", "R", "R"),
+        ("0", "_"): ("_", "R", "A"),
+        ("1", "0"): ("0", "R", "1"),
+        ("1", "1"): ("1", "R", "1"),
+        ("1", "_"): ("_", "L", "2"),
+        ("2", "0"): ("0", "R", "R"),
+        ("2", "1"): ("_", "L", "3"),
+        ("2", "_"): ("_", "R", "R"),
+        ("3", "0"): ("0", "L", "3"),
+        ("3", "1"): ("1", "L", "3"),
+        ("3", "_"): ("_", "R", "0"),
+    })
+
+_tm = Stanford0n1n()
+_configs[_tm.name] = _tm
+

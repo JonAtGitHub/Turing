@@ -86,7 +86,7 @@ class Tape:
         return self.__tape_contents[self.__head_position]
 
     def write_and_move(self, symbol, direction):
-        if symbol not in self.__input_symbols: raise ValueError("Unknown write symbol")
+        if symbol not in self.__tape_alphabet_symbols: raise ValueError("Unknown write symbol")
         if direction not in "LR": raise ValueError("Invalid direction")
         self.__tape_contents[self.__head_position] = symbol
         TuringMachineWatcher().tape_write(self.__stringify())
@@ -156,7 +156,7 @@ def inspect_transitions(transition_function):
     return ("".join(sorted(states)), "".join(sorted(input_symbols)))
 
 def main():
-    config = TuringMachineLibrary.get("BusyBeaver2")
+    config = TuringMachineLibrary.get("Stanford0n1n")
 
     inspection_results = inspect_transitions(config.transition_function)
 
