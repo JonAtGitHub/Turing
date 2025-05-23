@@ -89,3 +89,39 @@ class Stanford0n1n(TuringMachineConfiguration):
 _tm = Stanford0n1n()
 _configs[_tm.name] = _tm
 
+#*********************************************************************
+# L = { 0^(2^n) | n >= 0 }
+# from https://ics.uci.edu/~goodrich/teach/cs162/notes/turing2.pdf
+
+@dataclass
+class Uci02n(TuringMachineConfiguration):
+    name: str                   = "Uci02n"
+    tape_alphabet_symbols: str  = "_0x"
+    blank_symbol: str           = "_"
+    input_symbols: str          = "0"
+    initial_tape: str           = "000"
+    head_position: int          = 0
+    initial_state: str          = "1"
+    final_states: str           = "AR"
+    states: str                 = "12345AR"
+    transition_function: dict   = field(default_factory=lambda: {
+        ("1", "0"): ("_", "R", "2"),
+        ("1", "x"): ("x", "R", "R"),
+        ("1", "_"): ("_", "R", "R"),
+        ("2", "0"): ("x", "R", "3"),
+        ("2", "x"): ("x", "R", "2"),
+        ("2", "_"): ("_", "R", "A"),
+        ("3", "0"): ("0", "R", "4"),
+        ("3", "x"): ("x", "R", "3"),
+        ("3", "_"): ("_", "L", "5"),
+        ("4", "0"): ("x", "R", "3"),
+        ("4", "x"): ("x", "R", "4"),
+        ("4", "_"): ("_", "R", "R"),
+        ("5", "0"): ("0", "L", "5"),
+        ("5", "x"): ("x", "L", "5"),
+        ("5", "_"): ("_", "R", "2"),
+    })
+
+_tm = Uci02n()
+_configs[_tm.name] = _tm
+

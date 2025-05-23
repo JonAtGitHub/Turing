@@ -156,7 +156,7 @@ def inspect_transitions(transition_function):
     return ("".join(sorted(states)), "".join(sorted(input_symbols)))
 
 def main():
-    config = TuringMachineLibrary.get("Stanford0n1n")
+    config = TuringMachineLibrary.get("Uci02n")
 
     inspection_results = inspect_transitions(config.transition_function)
 
