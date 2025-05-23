@@ -1,4 +1,6 @@
 
+import TuringMachineLibrary
+
 class TuringMachineWatcher:
     _instance = None
 
@@ -34,7 +36,7 @@ class TuringMachineWatcher:
         pass
 
     def step_complete(self, is_final):
-        if is_final: print ("FINAL")
+        pass
 
     def step_input(self, state_input):
         self._state_input = state_input
@@ -154,30 +156,13 @@ def inspect_transitions(transition_function):
     return ("".join(sorted(states)), "".join(sorted(input_symbols)))
 
 def main():
-    Gamma = tape_alphabet_symbols = "01"
-    b = blank_symbol = "0"
-    Sigma = input_symbols = "1"
-    initial_tape = "000000000"; head_position = 4
-    initial_tape = "0"; head_position = 0
-    q0 = initial_state = "A"
-    Q = states = "ABCH"
-    F = final_states = "H"
-    delta = transition_function = {
-        # (current state, read symbol): (write symbol, head direction, next state)
-        # 3 state busy beaver
-        ("A", "0"): ("1", "R", "B"),
-        ("A", "1"): ("1", "L", "C"),
-        ("B", "0"): ("1", "L", "A"),
-        ("B", "1"): ("1", "R", "B"),
-        ("C", "0"): ("1", "L", "B"),
-        ("C", "1"): ("1", "R", "H"),
-    }
+    config = TuringMachineLibrary.get("BusyBeaver2")
 
-    inspection_results = inspect_transitions(transition_function)
+    inspection_results = inspect_transitions(config.transition_function)
 
-    tape = Tape(tape_alphabet_symbols, blank_symbol, input_symbols, initial_tape, head_position)
+    tape = Tape(config.tape_alphabet_symbols, config.blank_symbol, config.input_symbols, config.initial_tape, config.head_position)
 
-    turing_machine = TuringMachine(tape, states, transition_function, initial_state, final_states)
+    turing_machine = TuringMachine(tape, config.states, config.transition_function, config.initial_state, config.final_states)
 
     while not turing_machine.is_final():
         turing_machine.step()
